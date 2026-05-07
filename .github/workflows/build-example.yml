@@ -6,6 +6,8 @@ name: Build Example
 on:
   push:
     branches: [main, master]
+    tags:
+      - 'v*'
     paths:
       - 'CMakeLists.txt'
       - 'ElaWidgetTools/**'
@@ -14,6 +16,16 @@ on:
   pull_request:
     branches: [main, master]
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: '发布到 Release 的 tag 名（留空则只构建不发布）'
+        required: false
+        default: ''
+      prerelease:
+        description: '标记为预发布版本'
+        required: false
+        type: boolean
+        default: false
 
 env:
   QT_VERSION: 6.10.3
@@ -115,3 +127,52 @@ jobs:
           path: Install/
           retention-days: 14
           if-no-files-found: error
+
+  release:
+    name: 发布到 GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: |
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
+    permissions:
+      contents: write
+    steps:
+      - name: 下载所有平台 artifact
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: 打包每平台为 zip
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cd artifacts
+          for d in */; do
+            name="${d%/}"
+            (cd "$d" && zip -r "../../dist/${name}.zip" .)
+          done
+          cd ..
+          ls -lh dist/
+
+      - name: 计算 release tag
+        id: meta
+        env:
+          INPUT_TAG: ${{ inputs.release_tag }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            tag="$INPUT_TAG"
+          else
+            tag="$GITHUB_REF_NAME"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: 创建 Release 并上传产物
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.tag }}
+          prerelease: ${{ inputs.prerelease || false }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: dist/*.zip
