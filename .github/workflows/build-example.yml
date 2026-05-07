@@ -31,6 +31,13 @@ env:
   QT_VERSION: 6.10.3
   BUILD_TYPE: Release
 
+# 同一 commit SHA 的 run 只保留最新启动的一个：
+# 当先推 main、再推 tag 时，tag run 会取消同 SHA 的 main run，
+# 避免 7 分钟构建跑两遍而只有 tag run 真正用于发布
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.sha }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: ${{ matrix.name }}
@@ -119,6 +126,68 @@ jobs:
 
       - name: CMake install
         run: cmake --install build --config ${{ env.BUILD_TYPE }}
+
+      - name: 部署 Qt 运行时 (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          set -euo pipefail
+          APP="Install/ElaWidgetToolsExample/ElaWidgetToolsExample.app"
+          "$QT_ROOT_DIR/bin/macdeployqt" "$APP" -verbose=1
+          # 确认 frameworks 已嵌入
+          ls "$APP/Contents/Frameworks/" | head
+
+      - name: 部署 Qt 运行时 (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+
+          # 下载 linuxdeploy 与 qt plugin（continuous 是项目 release tag 名，对应最新稳定构建）
+          # 注意 plugin 必须命名为 linuxdeploy-plugin-qt（不含 .AppImage 扩展），
+          # 且与 linuxdeploy 在同一 PATH 下，linuxdeploy 才能识别 --plugin qt
+          BASE=https://github.com/linuxdeploy
+          curl -fsSL -o linuxdeploy \
+            "$BASE/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
+          curl -fsSL -o linuxdeploy-plugin-qt \
+            "$BASE/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage"
+          chmod +x linuxdeploy linuxdeploy-plugin-qt
+          export PATH="$PWD:$PATH"
+
+          # 构造符合 AppDir 规范的目录树
+          APPDIR="appdir"
+          mkdir -p "$APPDIR/usr/bin" \
+                   "$APPDIR/usr/share/applications" \
+                   "$APPDIR/usr/share/icons/hicolor/256x256/apps"
+          cp Install/ElaWidgetToolsExample/ElaWidgetToolsExample "$APPDIR/usr/bin/"
+
+          cat > "$APPDIR/usr/share/applications/ElaWidgetToolsExample.desktop" <<'DESKTOP'
+          [Desktop Entry]
+          Type=Application
+          Name=ElaWidgetToolsExample
+          Exec=ElaWidgetToolsExample
+          Icon=ElaWidgetToolsExample
+          Categories=Utility;
+          DESKTOP
+
+          # 1x1 透明 PNG 占位图标，linuxdeploy 要求 desktop 文件指向的 icon 必须存在
+          echo "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" \
+            | base64 -d > "$APPDIR/usr/share/icons/hicolor/256x256/apps/ElaWidgetToolsExample.png"
+
+          export QMAKE="$QT_ROOT_DIR/bin/qmake"
+          export PATH="$QT_ROOT_DIR/bin:$PATH"
+          export LD_LIBRARY_PATH="$QT_ROOT_DIR/lib:${LD_LIBRARY_PATH:-}"
+
+          ./linuxdeploy --appimage-extract-and-run \
+            --appdir "$APPDIR" \
+            --plugin qt \
+            --output appimage
+
+          # 用打包好的 AppImage 替换原裸二进制
+          rm -rf Install/ElaWidgetToolsExample
+          mkdir -p Install/ElaWidgetToolsExample
+          mv ElaWidgetToolsExample*.AppImage Install/ElaWidgetToolsExample/ElaWidgetToolsExample.AppImage
+          rm -f linuxdeploy linuxdeploy-plugin-qt
+
+          ls -lh Install/ElaWidgetToolsExample/
 
       - name: 上传构建产物
         uses: actions/upload-artifact@v4
