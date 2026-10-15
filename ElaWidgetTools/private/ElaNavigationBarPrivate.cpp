@@ -613,8 +613,9 @@ void ElaNavigationBarPrivate::_doUserButtonAnimation(bool isCompact, bool isAnim
         }
     });
     spacingAnimation->setEasingCurve(isCompact ? QEasingCurve::OutCubic : QEasingCurve::InOutSine);
-    spacingAnimation->setStartValue(isCompact ? 80 : 36);
-    spacingAnimation->setEndValue(isCompact ? 36 : 80);
+    int maximumSpacing = _userCard->getCardOrientation() == ElaCardOrientation::Orientation::Vertical ? (3 + (_pNavigationBarWidth - 8 - 64) / 2) : 80;
+    spacingAnimation->setStartValue(isCompact ? maximumSpacing : 36);
+    spacingAnimation->setEndValue(isCompact ? 36 : maximumSpacing);
     if (isCompact)
     {
         _userCard->setVisible(false);

@@ -409,6 +409,18 @@ void ElaWindow::setUserInfoCardSubTitle(QString subTitle)
     d->_navigationBar->setUserInfoCardSubTitle(subTitle);
 }
 
+void ElaWindow::setUserInfoCardPixMode(ElaCardPixType::PixMode pixMode)
+{
+    Q_D(ElaWindow);
+    d->_navigationBar->setUserInfoCardPixMode(pixMode);
+}
+
+void ElaWindow::setUserInfoCardOrientation(ElaCardOrientation::Orientation orientation)
+{
+    Q_D(ElaWindow);
+    d->_navigationBar->setUserInfoCardOrientation(orientation);
+}
+
 ElaNavigationType::NodeResult ElaWindow::addExpanderNode(const QString& expanderTitle, QString& expanderKey, ElaIconType::IconName awesome) const
 {
     Q_D(const ElaWindow);
