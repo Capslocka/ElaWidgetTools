@@ -135,7 +135,10 @@ ElaWindow::~ElaWindow()
 {
     Q_D(ElaWindow);
     eApp->syncWindowDisplayMode(this, false);
-    delete this->style();
+
+    // this->style() 继承自QObject，从style()中获取，所以这里不能delete，交由QT管理
+    // delete this->style();
+
     delete d->_lightWindowPix;
     delete d->_darkWindowPix;
 }
