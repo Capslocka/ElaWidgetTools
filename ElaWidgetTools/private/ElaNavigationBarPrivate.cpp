@@ -596,7 +596,7 @@ void ElaNavigationBarPrivate::_doUserButtonAnimation(bool isCompact, bool isAnim
         _userButton->setFixedSize(value.toRect().size());
     });
     userButtonAnimation->setEasingCurve(isCompact ? QEasingCurve::OutCubic : QEasingCurve::InOutSine);
-    QRect maximumRect = QRect(13, 18, 64, 64);
+    QRect maximumRect = _userCard->getCardOrientation() == ElaCardOrientation::Orientation::Vertical ? QRect(116, 10, 64, 64) : QRect(13, 18, 64, 64);
     QRect compactRect = QRect(3, 10, 36, 36);
     userButtonAnimation->setStartValue(isCompact ? maximumRect : compactRect);
     userButtonAnimation->setEndValue(isCompact ? compactRect : maximumRect);
