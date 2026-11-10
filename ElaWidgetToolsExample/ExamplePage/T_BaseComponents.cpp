@@ -11,6 +11,7 @@
 #include "ElaRadioButton.h"
 #include "ElaScrollPageArea.h"
 #include "ElaSlider.h"
+#include "ElaDateTimeEdit.h"
 #include "ElaSpinBox.h"
 #include "ElaText.h"
 #include "ElaToggleButton.h"
@@ -225,6 +226,15 @@ T_BaseComponents::T_BaseComponents(QWidget* parent)
     sliderLayout->addWidget(_slider);
     sliderLayout->addStretch();
 
+    _dateTimeEdit = new ElaDateTimeEdit(this);
+    ElaScrollPageArea* dateTimeEditArea = new ElaScrollPageArea(this);
+    QHBoxLayout* dateTimeEditLayout = new QHBoxLayout(dateTimeEditArea);
+    ElaText* dateTimeEditText = new ElaText("ElaDateTimeEdit", this);
+    dateTimeEditText->setTextPixelSize(15);
+    dateTimeEditLayout->addWidget(dateTimeEditText);
+    dateTimeEditLayout->addWidget(_dateTimeEdit);
+    dateTimeEditLayout->addStretch();
+
     _radioButton = new ElaRadioButton("RadioButton", this);
     ElaScrollPageArea* radioButtonArea = new ElaScrollPageArea(this);
     QHBoxLayout* radioButtonLayout = new QHBoxLayout(radioButtonArea);
@@ -327,6 +337,7 @@ T_BaseComponents::T_BaseComponents(QWidget* parent)
     centerLayout->addWidget(checkBoxArea);
     centerLayout->addWidget(spinBoxArea);
     centerLayout->addWidget(sliderArea);
+    centerLayout->addWidget(dateTimeEditArea);
     centerLayout->addWidget(radioButtonArea);
     centerLayout->addWidget(progressBarArea);
     centerLayout->addWidget(progressRingArea);
