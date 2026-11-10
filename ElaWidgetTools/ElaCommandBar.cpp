@@ -92,13 +92,13 @@ void ElaCommandBar::paintEvent(QPaintEvent *event)
 			if (d->_pressedIndex == i)
 			{
 				painter.setPen(Qt::NoPen);
-				painter.setBrush(ElaThemeColor(d->_themeMode, BasicPress));
+				painter.setBrush(ElaThemeColor(d->_themeMode, BasicPressAlpha));
 				painter.drawRoundedRect(itemRect, 4, 4);
 			}
 			else if (d->_hoveredIndex == i)
 			{
 				painter.setPen(Qt::NoPen);
-				painter.setBrush(ElaThemeColor(d->_themeMode, BasicHover));
+				painter.setBrush(ElaThemeColor(d->_themeMode, BasicHoverAlpha));
 				painter.drawRoundedRect(itemRect, 4, 4);
 			}
 
@@ -145,13 +145,13 @@ void ElaCommandBar::paintEvent(QPaintEvent *event)
 		if (d->_pressedIndex == overflowIndex)
 		{
 			painter.setPen(Qt::NoPen);
-			painter.setBrush(ElaThemeColor(d->_themeMode, BasicPress));
+			painter.setBrush(ElaThemeColor(d->_themeMode, BasicPressAlpha));
 			painter.drawRoundedRect(overflowRect, 4, 4);
 		}
 		else if (d->_hoveredIndex == overflowIndex)
 		{
 			painter.setPen(Qt::NoPen);
-			painter.setBrush(ElaThemeColor(d->_themeMode, BasicHover));
+			painter.setBrush(ElaThemeColor(d->_themeMode, BasicHoverAlpha));
 			painter.drawRoundedRect(overflowRect, 4, 4);
 		}
 		QFont iconFont = QFont("ElaAwesome");
