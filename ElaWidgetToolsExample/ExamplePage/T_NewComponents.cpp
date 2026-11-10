@@ -168,6 +168,14 @@ T_NewComponents::T_NewComponents(QWidget *parent)
 	expanderContentLayout->addWidget(proxyPort);
 	_expander->setContentWidget(expanderContent);
 
+	ElaPushButton *expanderHeaderButton = new ElaPushButton("重置", this);
+	expanderHeaderButton->setFixedSize(70, 28);
+	_expander->setHeaderWidget(expanderHeaderButton);
+	connect(expanderHeaderButton, &ElaPushButton::clicked, this, [=]()
+	{
+		ElaToast::success("Header 按钮点击生效", 2000, window());
+	});
+
 	ElaText *expanderUpText = new ElaText("ElaExpander (向上展开)", this);
 	expanderUpText->setTextPixelSize(15);
 	_expanderUp = new ElaExpander("高级设置", this);
@@ -187,6 +195,14 @@ T_NewComponents::T_NewComponents(QWidget *parent)
 	expanderUpContentLayout->addLayout(dbgLay);
 	expanderUpContentLayout->addLayout(logLay);
 	_expanderUp->setContentWidget(expanderUpContent);
+
+	ElaPushButton *expanderUpHeaderButton = new ElaPushButton("说明", this);
+	expanderUpHeaderButton->setFixedSize(70, 28);
+	_expanderUp->setHeaderWidget(expanderUpHeaderButton);
+	connect(expanderUpHeaderButton, &ElaPushButton::clicked, this, [=]()
+	{
+		ElaToast::info("向上展开的 Header 按钮", 2000, window());
+	});
 
 	// ========== ElaTeachingTip 示例 ==========
 	_teachingTip = new ElaTeachingTip(this);
