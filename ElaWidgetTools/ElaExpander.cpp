@@ -276,7 +276,7 @@ void ElaExpander::paintEvent(QPaintEvent *event)
 
 	// Background
 	painter.setPen(QPen(ElaThemeColor(d->_themeMode, BasicBorder), 1));
-	painter.setBrush(ElaThemeColor(d->_themeMode, BasicBase));
+	painter.setBrush(ElaThemeColor(d->_themeMode, BasicBaseAlpha));
 	painter.drawRoundedRect(QRectF(0.5, 0.5, width() - 1, height() - 1), d->_pBorderRadius, d->_pBorderRadius);
 
 	// Header separator line when expanded
