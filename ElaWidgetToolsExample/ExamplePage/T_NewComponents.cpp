@@ -309,6 +309,9 @@ T_NewComponents::T_NewComponents(QWidget *parent)
 	ElaTag *dangerTag = new ElaTag(this);
 	dangerTag->setTagText("Danger");
 	dangerTag->setTagColor(ElaTag::Danger);
+	ElaTag *customTag = new ElaTag(this);
+	customTag->setTagText("Custom");
+	customTag->setTagColor(QColor(0x8B, 0x5C, 0xF6));
 
 	ElaScrollPageArea *tagArea = new ElaScrollPageArea(this);
 	QHBoxLayout *tagLayout = new QHBoxLayout(tagArea);
@@ -319,6 +322,7 @@ T_NewComponents::T_NewComponents(QWidget *parent)
 	tagLayout->addWidget(successTag);
 	tagLayout->addWidget(warningTag);
 	tagLayout->addWidget(dangerTag);
+	tagLayout->addWidget(customTag);
 	tagLayout->addStretch();
 
 	// Tag 可关闭
