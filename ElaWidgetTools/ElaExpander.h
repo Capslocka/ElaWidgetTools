@@ -38,13 +38,12 @@ public:
     void setIsExpanded(bool expanded);
     bool getIsExpanded() const;
 
-    QSize sizeHint() const override;
+    void resizeToContent();
 
 Q_SIGNALS:
     Q_SIGNAL void expandStateChanged(bool expanded);
 
 protected:
-    virtual void resizeEvent(QResizeEvent* event) override;
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void mouseReleaseEvent(QMouseEvent* event) override;

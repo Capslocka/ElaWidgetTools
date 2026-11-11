@@ -36,10 +36,22 @@ void ElaExpanderPrivate::_toggleExpand()
 
 void ElaExpanderPrivate::_updateContentHeight()
 {
-	int height = _contentLayout->contentsMargins().top() + _contentLayout->contentsMargins().bottom();
-	if (_contentWidget)
+	Q_Q(ElaExpander);
+	const QMargins margins = _contentLayout->contentsMargins();
+	int height = margins.top() + margins.bottom();
+	const int availableWidth = qMax(0, q->width() - margins.left() - margins.right());
+	if (_contentWidget) 
 	{
-		height += qMax(_contentWidget->sizeHint().height(), _contentWidget->minimumSizeHint().height());
+		if (_contentWidget->hasHeightForWidth() && availableWidth > 0)
+		{
+			height += qMax(_contentWidget->heightForWidth(availableWidth),
+				_contentWidget->minimumSizeHint().height());
+		}
+		else
+		{
+			height += qMax(_contentWidget->sizeHint().height(),
+				_contentWidget->minimumSizeHint().height());
+		}
 	}
 	if (height < 40)
 	{
@@ -111,7 +123,6 @@ void ElaExpanderPrivate::_startExpandAnimation(bool expand)
 		}
 		_expandAnimation->setEndValue(collapsedHeight);
 	}
-	_updateGeometry();
 	_expandAnimation->start();
 }
 
@@ -167,8 +178,6 @@ void ElaExpander::setExpandDirection(ExpandDirection direction)
 {
 	Q_D(ElaExpander);
 	d->_expandDirection = direction;
-	d->_updateGeometry();
-	update();
 }
 
 ElaExpander::ExpandDirection ElaExpander::getExpandDirection() const
@@ -255,16 +264,10 @@ bool ElaExpander::getIsExpanded() const
 	return d_ptr->_isExpanded;
 }
 
-QSize ElaExpander::sizeHint() const
-{
-	return QSize(200, d_ptr->_headerHeight + (d_ptr->_isExpanded ? d_ptr->_contentHeight : 0));
-}
-
-void ElaExpander::resizeEvent(QResizeEvent *event)
+void ElaExpander::resizeToContent()
 {
 	Q_D(ElaExpander);
-	QWidget::resizeEvent(event);
-	d->_updateGeometry();
+	d->_startExpandAnimation(d->_isExpanded);
 }
 
 void ElaExpander::paintEvent(QPaintEvent *event)
@@ -381,11 +384,17 @@ void ElaExpander::mouseReleaseEvent(QMouseEvent *event)
 
 bool ElaExpander::event(QEvent *event)
 {
+	Q_D(ElaExpander);
 	switch (event->type())
 	{
 		case QEvent::Enter:
 		case QEvent::Leave:
 			update();
+			break;
+		case QEvent::Show:
+			resizeToContent();
+		case QEvent::Resize:
+			d->_updateGeometry();
 			break;
 		default:
 			break;
