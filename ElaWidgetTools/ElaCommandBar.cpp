@@ -216,7 +216,7 @@ void ElaCommandBar::paintEvent(QPaintEvent *event)
 				painter.setFont(textFont);
 				painter.setPen(fgColor);
 				int textX = (item.icon != ElaIconType::None) ? xOffset : itemRect.x() + 6;
-				QRect textRect(textX, itemRect.y(), itemRect.right() - textX - 6, itemRect.height());
+				QRect textRect(textX, itemRect.y(), itemRect.x() + itemRect.width() - textX - 6, itemRect.height());
 				painter.drawText(textRect, Qt::AlignVCenter | Qt::AlignLeft, item.text);
 			}
 		}
@@ -422,7 +422,7 @@ int ElaCommandBarPrivate::_getItemWidth(const ElaCommandBar::CommandItem &item) 
 	QFont textFont = q_ptr->font();
 	textFont.setPixelSize(12);
 	QFontMetrics fm(textFont);
-	w += fm.horizontalAdvance(item.text);
+	w += qMax(fm.horizontalAdvance(item.text), fm.boundingRect(item.text).width());
 	if (w < _pButtonSize)
 	{
 		w = _pButtonSize;
