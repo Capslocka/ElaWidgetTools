@@ -12,6 +12,7 @@
 #include "ElaLineEdit.h"
 #include "ElaMarkdownViewer.h"
 #include "ElaMenu.h"
+#include "ElaMessageBox.h"
 #include "ElaNumberBox.h"
 #include "ElaPagination.h"
 #include "ElaPasswordBox.h"
@@ -519,6 +520,55 @@ T_NewComponents::T_NewComponents(QWidget *parent)
 	cmdLayout->addWidget(new ElaText("ElaCommandBar", 15, this));
 	cmdLayout->addWidget(_commandBar);
 	cmdLayout->addStretch();
+
+	// ========== ElaMessageBox 示例 ==========
+	ElaPushButton *msgInfoBtn = new ElaPushButton("信息", this);
+	msgInfoBtn->setFixedSize(70, 32);
+	connect(msgInfoBtn, &ElaPushButton::clicked, this, [=]()
+	{
+		ElaMessageBox::information(this, "提示", "配置文件已自动保存到本地。", {"确定"});
+	});
+
+	ElaPushButton *msgWarnBtn = new ElaPushButton("警告", this);
+	msgWarnBtn->setFixedSize(70, 32);
+	connect(msgWarnBtn, &ElaPushButton::clicked, this, [=]()
+	{
+		int ret = ElaMessageBox::warning(this, "删除确认", "确定要删除选中项吗？该操作不可撤销。", {"取消", "确定"});
+		ElaToast::info(QString("返回索引：%1").arg(ret), 2000, window());
+	});
+
+	ElaPushButton *msgCriticalBtn = new ElaPushButton("错误", this);
+	msgCriticalBtn->setFixedSize(70, 32);
+	connect(msgCriticalBtn, &ElaPushButton::clicked, this, [=]()
+	{
+		ElaMessageBox::critical(this, "操作失败", "无法连接到服务器，请检查网络设置后重试。", {"确定"});
+	});
+
+	ElaPushButton *msgQuestionBtn = new ElaPushButton("询问", this);
+	msgQuestionBtn->setFixedSize(70, 32);
+	connect(msgQuestionBtn, &ElaPushButton::clicked, this, [=]()
+	{
+		int ret = ElaMessageBox::question(this, "保存更改", "是否保存当前文档的修改？", {"否", "是"}, 1);
+		ElaToast::info(QString("返回索引：%1").arg(ret), 2000, window());
+	});
+
+	ElaPushButton *msgAboutBtn = new ElaPushButton("关于", this);
+	msgAboutBtn->setFixedSize(70, 32);
+	connect(msgAboutBtn, &ElaPushButton::clicked, this, [=]()
+	{
+		ElaMessageBox::about(this, "关于", "ElaWidgetTools 示例程序  版本 1.0.0");
+	});
+
+	ElaScrollPageArea *msgBoxArea = new ElaScrollPageArea(this);
+	QHBoxLayout *msgBoxLayout = new QHBoxLayout(msgBoxArea);
+	msgBoxLayout->addWidget(new ElaText("ElaMessageBox", 15, this));
+	msgBoxLayout->addSpacing(10);
+	msgBoxLayout->addWidget(msgInfoBtn);
+	msgBoxLayout->addWidget(msgWarnBtn);
+	msgBoxLayout->addWidget(msgCriticalBtn);
+	msgBoxLayout->addWidget(msgQuestionBtn);
+	msgBoxLayout->addWidget(msgAboutBtn);
+	msgBoxLayout->addStretch();
 
 	// ========== ElaPagination 示例 ==========
 	QStackedWidget *pageStack = new QStackedWidget(this);
@@ -1281,6 +1331,7 @@ T_NewComponents::T_NewComponents(QWidget *parent)
 	c->addLayout(stepsCtrl);
 	c->addWidget(_steps);
 	c->addWidget(cmdArea);
+	c->addWidget(msgBoxArea);
 	c->addWidget(pgArea);
 	c->addWidget(pageStack);
 	c->addWidget(expanderText);
