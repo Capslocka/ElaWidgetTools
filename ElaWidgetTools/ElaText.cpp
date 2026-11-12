@@ -12,6 +12,7 @@ ElaText::ElaText(QWidget* parent)
     d->q_ptr = this;
     d->_pTextStyle = ElaTextType::NoStyle;
     d->_pElaIcon = ElaIconType::None;
+    d->_pIconColor = QColor();
     setObjectName("ElaText");
     setStyleSheet("#ElaText{background-color:transparent;}");
     QFont textFont = font();
@@ -154,6 +155,19 @@ ElaIconType::IconName ElaText::getElaIcon() const
     return d->_pElaIcon;
 }
 
+void ElaText::setIconColor(QColor IconColor)
+{
+    Q_D(ElaText);
+    d->_pIconColor = IconColor;
+    Q_EMIT pIconColorChanged();
+    update();
+}
+
+QColor ElaText::getIconColor() const
+{
+    return d_ptr->_pIconColor;
+}
+
 void ElaText::paintEvent(QPaintEvent* event)
 {
     Q_D(ElaText);
@@ -169,7 +183,7 @@ void ElaText::paintEvent(QPaintEvent* event)
         QFont iconFont = QFont("ElaAwesome");
         iconFont.setPixelSize(this->font().pixelSize());
         painter.setFont(iconFont);
-        painter.setPen(ElaThemeColor(d->_themeMode, BasicText));
+        painter.setPen(d->_pIconColor.isValid() ? d->_pIconColor : ElaThemeColor(d->_themeMode, BasicText));
         painter.drawText(rect(), Qt::AlignCenter, QChar((unsigned short)d->_pElaIcon));
         painter.restore();
     }
