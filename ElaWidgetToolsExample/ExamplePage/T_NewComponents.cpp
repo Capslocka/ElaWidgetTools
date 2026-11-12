@@ -497,6 +497,7 @@ T_NewComponents::T_NewComponents(QWidget *parent)
 
 	// ========== ElaCommandBar 示例 ==========
 	_commandBar = new ElaCommandBar(this);
+	_commandBar->setItemSpacing(4);
 	_commandBar->addItem({ElaIconType::Copy, "复制"});
 	_commandBar->addItem({ElaIconType::Paste, "粘贴"});
 	_commandBar->addItem({ElaIconType::Scissors, "剪切"});
@@ -505,6 +506,13 @@ T_NewComponents::T_NewComponents(QWidget *parent)
 	_commandBar->addItem({ElaIconType::ArrowRotateRight, "重做"});
 	_commandBar->addSeparator();
 	_commandBar->addItem({ElaIconType::FloppyDisk, "保存"});
+	_commandBar->addSeparator();
+	_commandBar->addItem({ElaIconType::FloppyDisk, "自动保存", false, true, true});
+	_commandBar->addItem({ElaIconType::TableCells, "显示网格", false, true, false});
+	connect(_commandBar, &ElaCommandBar::itemCheckedChanged, this, [=](int index, bool checked)
+	{
+		ElaToast::info(QString("第 %1 项：%2").arg(index).arg(checked ? "已勾选" : "已取消"), 2000, window());
+	});
 
 	ElaScrollPageArea *cmdArea = new ElaScrollPageArea(this);
 	QHBoxLayout *cmdLayout = new QHBoxLayout(cmdArea);
