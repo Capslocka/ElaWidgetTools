@@ -11,6 +11,7 @@ class ElaTextPrivate : public QObject
     Q_OBJECT
     Q_D_CREATE(ElaText)
     Q_PROPERTY_CREATE_D(ElaTextType::TextStyle, TextStyle)
+    Q_PROPERTY_CREATE_D(QColor, TextColor)
     Q_PROPERTY_CREATE_D(ElaIconType::IconName, ElaIcon)
     Q_PROPERTY_CREATE_D(QColor, IconColor)
 public:

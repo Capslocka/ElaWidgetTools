@@ -15,6 +15,7 @@ class ELA_EXPORT ElaText : public QLabel
     Q_PROPERTY_CREATE_Q_H(int, TextPixelSize)
     Q_PROPERTY_CREATE_Q_H(int, TextPointSize)
     Q_PROPERTY_CREATE_Q_H(ElaTextType::TextStyle, TextStyle)
+    Q_PROPERTY_CREATE_Q_H(QColor, TextColor)
     Q_PROPERTY_CREATE_Q_H(ElaIconType::IconName, ElaIcon)
     Q_PROPERTY_CREATE_Q_H(QColor, IconColor)
 public:

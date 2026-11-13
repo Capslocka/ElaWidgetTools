@@ -11,6 +11,7 @@ ElaText::ElaText(QWidget* parent)
     Q_D(ElaText);
     d->q_ptr = this;
     d->_pTextStyle = ElaTextType::NoStyle;
+    d->_pTextColor = QColor();
     d->_pElaIcon = ElaIconType::None;
     d->_pIconColor = QColor();
     setObjectName("ElaText");
@@ -141,6 +142,24 @@ ElaTextType::TextStyle ElaText::getTextStyle() const
     return d->_pTextStyle;
 }
 
+void ElaText::setTextColor(QColor TextColor)
+{
+    Q_D(ElaText);
+    d->_pTextColor = TextColor;
+    Q_EMIT pTextColorChanged();
+    const QColor textColor = TextColor.isValid() ? TextColor : ElaThemeColor(d->_themeMode, BasicText);
+    QPalette palette = this->palette();
+    palette.setColor(QPalette::Text, textColor);
+    palette.setColor(QPalette::WindowText, textColor);
+    setPalette(palette);
+    update();
+}
+
+QColor ElaText::getTextColor() const
+{
+    return d_ptr->_pTextColor;
+}
+
 void ElaText::setElaIcon(ElaIconType::IconName elaIcon)
 {
     Q_D(ElaText);
@@ -171,7 +190,7 @@ QColor ElaText::getIconColor() const
 void ElaText::paintEvent(QPaintEvent* event)
 {
     Q_D(ElaText);
-    if (palette().color(QPalette::WindowText) != ElaThemeColor(d->_themeMode, BasicText))
+    if (!d->_pTextColor.isValid() && palette().color(QPalette::WindowText) != ElaThemeColor(d->_themeMode, BasicText))
     {
         d->onThemeChanged(d->_themeMode);
     }
@@ -194,7 +213,7 @@ void ElaText::paintEvent(QPaintEvent* event)
             QPainter painter(this);
             painter.save();
             painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-            painter.setPen(ElaThemeColor(d->_themeMode, BasicText));
+            painter.setPen(d->_pTextColor.isValid() ? d->_pTextColor : ElaThemeColor(d->_themeMode, BasicText));
             painter.drawText(rect(), Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap | Qt::TextWrapAnywhere, text());
             painter.restore();
         }
